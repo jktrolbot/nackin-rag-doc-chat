@@ -44,7 +44,13 @@ export async function POST(request: NextRequest) {
 
     const { data: doc, error: docError } = await supabaseAdmin
       .from("documents")
-      .insert({ name: file.name, size: file.size, status: "processing" })
+      .insert({
+        name: file.name,
+        size: file.size,
+        status: "processing",
+        // workspace_id is nullable – no workspace selected at upload time
+        workspace_id: null,
+      })
       .select()
       .single();
 

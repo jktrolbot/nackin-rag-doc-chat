@@ -40,6 +40,8 @@ export async function processPDF(
         content,
         embedding: JSON.stringify(embeddings[j]),
         chunk_index: i + j,
+        // workspace_id is nullable – inherited context from parent document
+        workspace_id: null,
       }));
 
       const { error } = await supabaseAdmin
