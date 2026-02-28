@@ -30,6 +30,15 @@ export function ChatInterface({ selectedDocumentId, selectedDocumentName }: Chat
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  // Clear conversation when the selected document changes
+  useEffect(() => {
+    setMessages([]);
+    setInput("");
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+    }
+  }, [selectedDocumentId]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
