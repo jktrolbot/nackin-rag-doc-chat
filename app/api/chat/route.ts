@@ -24,6 +24,16 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const MAX_MESSAGE_LENGTH = 10000;
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return new Response(
+        JSON.stringify({
+          error: `Message too long. Maximum allowed length is ${MAX_MESSAGE_LENGTH} characters.`,
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     const queryEmbedding = await generateEmbedding(message);
 
     const { data: chunks, error: matchError } = await supabaseAdmin.rpc(
