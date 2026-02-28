@@ -15,22 +15,29 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    const { data: doc } = await supabaseAdmin
+    // Fetch the document first to check existence and get the storage path
+    const { data: doc, error: selectError } = await supabaseAdmin
       .from("documents")
       .select("name")
       .eq("id", id)
       .single();
 
-    if (doc) {
-      await supabaseAdmin.storage.from("pdfs").remove([`${id}/${doc.name}`]);
+    if (selectError || !doc) {
+      return NextResponse.json(
+        { error: "Document not found" },
+        { status: 404 }
+      );
     }
 
-    const { error } = await supabaseAdmin
+    // Remove from storage (best-effort; don't block delete on failure)
+    await supabaseAdmin.storage.from("pdfs").remove([`${id}/${doc.name}`]);
+
+    const { error: deleteError } = await supabaseAdmin
       .from("documents")
       .delete()
       .eq("id", id);
 
-    if (error) throw error;
+    if (deleteError) throw deleteError;
 
     return NextResponse.json({ success: true });
   } catch (error) {
